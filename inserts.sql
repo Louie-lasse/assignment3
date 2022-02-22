@@ -1,4 +1,5 @@
 INSERT INTO Departments VALUES ('Dep1','D1');
+INSERT INTO Departments VALUES ('Dep2','D2');
 
 INSERT INTO Programs VALUES ('Prog1','P1'),
                             ('Prog2','P2');
