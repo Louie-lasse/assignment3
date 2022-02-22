@@ -17,7 +17,7 @@ WHERE grade != 'U';
 
 --(student, course, credits)
 --(student, course, status)
-CREATE VIEW Registration AS 
+CREATE VIEW Registrations AS 
 SELECT student AS idnr,course,'registered' AS status
 FROM Registered
 UNION
