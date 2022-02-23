@@ -63,6 +63,6 @@ INSERT INTO Taken VALUES('4444444444','CCC111','5'),
                         ('2222222222','CCC444','U');
 
 
-INSERT INTO WaitingList VALUES('3333333333','CCC222',1),
-                              ('3333333333','CCC333',1), 
-                              ('2222222222','CCC333',2);
+INSERT INTO WaitingList VALUES('3333333333','CCC222'),
+                              ('3333333333','CCC333'), 
+                              ('2222222222','CCC333');
