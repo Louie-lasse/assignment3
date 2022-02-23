@@ -36,7 +36,7 @@ CREATE OR REPLACE FUNCTION registration_insertion() RETURNS trigger AS $registra
         IF courseOverbooked(NEW.course) THEN
             RAISE EXCEPTION 'Course % is fully booked',NEW.course;
         END IF;
-        raise notice 'Success';
+        RAISE NOTICE 'Success';
         RETURN NEW;
     END;
 $registration_insertion$ LANGUAGE plpgsql;
