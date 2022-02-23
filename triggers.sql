@@ -34,9 +34,11 @@ CREATE OR REPLACE FUNCTION registration_insertion() RETURNS trigger AS $registra
             RAISE EXCEPTION 'Student % has already passed the course',NEW.idnr;
         END IF;
         IF courseOverbooked(NEW.course) THEN
-            RAISE EXCEPTION 'Course % is fully booked',NEW.course;
+            RAISE NOTICE 'Course % is fully booked, putting student into waitinglist',NEW.course;
+            INSERT INTO WaitingList VALUES (NULL,NULL,NULL);
+        ELSE
+            INSERT INTO Registered VALUES (NEW.idnr,NEW.course);
         END IF;
-        RAISE NOTICE 'Success';
         RETURN NEW;
     END;
 $registration_insertion$ LANGUAGE plpgsql;
