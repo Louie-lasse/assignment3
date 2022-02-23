@@ -125,7 +125,7 @@ CREATE TABLE Taken(
 CREATE TABLE WaitingList(
     student CHAR(10) REFERENCES Students(idnr),
     course CHAR(6) REFERENCES LimitedCourses(code),
-    position SERIAL NOT NULL,
+    position SERIAL,
     PRIMARY KEY (student,course),
     UNIQUE(course,position)
 );
