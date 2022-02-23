@@ -10,10 +10,6 @@ CREATE OR REPLACE FUNCTION prerequisitesMet(TEXT,TEXT) RETURNS BOOLEAN AS $$
     END;
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION nextPos (CHAR(6)) RETURNS INT AS $$
-    SELECT COUNT(*) + 1 FROM waitinglist WHERE course = $1
-$$LANGUAGE SQL;
-
 CREATE OR REPLACE FUNCTION courseOverbooked (course TEXT) 
 RETURNS BOOLEAN LANGUAGE plpgsql AS $$
 DECLARE
@@ -39,7 +35,7 @@ CREATE OR REPLACE FUNCTION registration_insertion() RETURNS trigger AS $registra
         END IF;
         IF courseOverbooked(NEW.course) THEN
             RAISE NOTICE 'Course % is fully booked, putting student into waitinglist',NEW.course;
-            INSERT INTO WaitingList VALUES (NEW.idnr,NEW.course,nextPos(NEW.course));
+            INSERT INTO WaitingList VALUES (NEW.idnr,NEW.course);
         ELSE
             INSERT INTO Registered VALUES (NEW.idnr,NEW.course);
         END IF;
