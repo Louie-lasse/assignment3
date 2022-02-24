@@ -43,5 +43,34 @@ CREATE OR REPLACE FUNCTION registration_insertion() RETURNS trigger AS $registra
     END;
 $registration_insertion$ LANGUAGE plpgsql;
 
-CREATE TRIGGER insertInLimited INSTEAD OF INSERT ON Registrations
+CREATE TRIGGER insertInRegistrations INSTEAD OF INSERT ON Registrations
     FOR EACH ROW EXECUTE FUNCTION registration_insertion();
+
+CREATE OR REPLACE FUNCTION registrations_deletion() RETURNS trigger AS $registrations_deletion$
+    BEGIN
+        IF (NEW.status = 'waiting') THEN
+            DELETE FROM WaitingList W WHERE W.student = OLD.idnr
+                                        AND W.course = OLD.course;
+            RAISE NOTICE 'Deleted waiting student';
+        ELSE
+            DELETE FROM Registered r WHERE R.student = OLD.idnr
+                                        AND R.course = OLD.course;
+            RAISE NOTICE 'Deleted registered student';
+        END IF;
+        RETURN OLD;
+    END;
+$registrations_deletion$ LANGUAGE plpgsql;
+
+CREATE TRIGGER deleteFromRegistrations INSTEAD OF DELETE ON Registrations
+    FOR EACH ROW EXECUTE FUNCTION registrations_deletion();
+
+CREATE OR REPLACE FUNCTION registered_deletion() RETURNS trigger AS $registered_deletion$
+    BEGIN
+        RAISE NOTICE 'NEW: %',NEW.course;
+        RAISE NOTICE 'OLD: %',OLD.course;
+        RETURN NEW;
+    END;
+$registered_deletion$ LANGUAGE plpgsql;
+
+CREATE TRIGGER deleteFromRegistered AFTER DELETE ON Registered
+    FOR EACH ROW EXECUTE FUNCTION registered_deletion();
