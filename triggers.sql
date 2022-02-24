@@ -33,6 +33,9 @@ CREATE OR REPLACE FUNCTION registration_insertion() RETURNS trigger AS $registra
                    WHERE P.idnr = NEW.idnr AND P.course = NEW.course) THEN
             RAISE EXCEPTION 'Student % has already passed the course',NEW.idnr;
         END IF;
+        IF ((NEW.idnr,NEW.course) IN (SELECT idnr,course FROM Registrations)) THEN
+            RAISE EXCEPTION 'Student is already registered or in the waitinglist for course %',NEW.course;
+        END IF;
         IF courseOverbooked(NEW.course) THEN
             RAISE NOTICE 'Course % is fully booked, putting student into waitinglist',NEW.course;
             INSERT INTO WaitingList VALUES (NEW.idnr,NEW.course);
