@@ -69,8 +69,6 @@ CREATE TRIGGER deleteFromRegistrations INSTEAD OF DELETE ON Registrations
 
 CREATE OR REPLACE FUNCTION registered_deletion() RETURNS trigger AS $registered_deletion$
     BEGIN
-        RAISE NOTICE 'NEW: %',NEW.course;
-        RAISE NOTICE 'OLD: %',OLD.course;
         RETURN NEW;
     END;
 $registered_deletion$ LANGUAGE plpgsql;
