@@ -68,8 +68,18 @@ CREATE TRIGGER deleteFromRegistrations INSTEAD OF DELETE ON Registrations
     FOR EACH ROW EXECUTE FUNCTION registrations_deletion();
 
 CREATE OR REPLACE FUNCTION registered_deletion() RETURNS trigger AS $registered_deletion$
+    DECLARE
+        firstInLine WaitingList%rowtype;
     BEGIN
-        RETURN NEW;
+        IF NOT (courseOverbooked(OLD.course)) THEN
+            SELECT * FROM WaitingList W INTO firstInLine
+                WHERE W.course = OLD.course
+                ORDER BY position
+                LIMIT 1;
+            RAISE NOTICE 'First in line is % with position %',
+                firstInLine.student, firstInLine.position;
+        END IF;
+        RETURN OLD;
     END;
 $registered_deletion$ LANGUAGE plpgsql;
 
