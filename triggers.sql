@@ -71,15 +71,17 @@ CREATE OR REPLACE FUNCTION registered_deletion() RETURNS trigger AS $registered_
     DECLARE
         firstInLine WaitingList%rowtype;
     BEGIN
+        RAISE EXCEPTION 'Overbooked: %', (courseOverbooked(OLD.course))
         IF NOT (courseOverbooked(OLD.course)) THEN
+            RAISE NOTICE 'Did a thing';
             SELECT * FROM WaitingList W INTO firstInLine
                 WHERE W.course = OLD.course
                 ORDER BY position
                 LIMIT 1;
-            RAISE NOTICE 'First in line is % with position %',
-                firstInLine.student, firstInLine.position;
+            DELETE FROM WaitingList W WHERE W.student = firstInLine.student
+                                            AND W.course = firstInLine.course;
         END IF;
-        RETURN OLD;
+        RETURN firstInLine;
     END;
 $registered_deletion$ LANGUAGE plpgsql;
 

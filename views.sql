@@ -1,30 +1,30 @@
 --(idnr, name, login, program, branch)
-CREATE VIEW BasicInformation AS
+CREATE OR REPLACE VIEW BasicInformation AS
 SELECT idnr,name,login,S.program,branch
 FROM Students S
 LEFT JOIN StudentBranches ON idnr=student;
 
 --(student,course,grade,credits)
-CREATE VIEW FinishedCourses AS 
+CREATE OR REPLACE VIEW FinishedCourses AS 
 SELECT idnr,course,grade,credits FROM STUDENTS
 INNER JOIN TAKEN ON student = idnr
 INNER JOIN Courses ON course = code;
 
-CREATE VIEW PassedCourses AS
+CREATE OR REPLACE VIEW PassedCourses AS
 SELECT idnr,course,credits
 FROM FinishedCourses
 WHERE grade != 'U'; 
 
 --(student, course, credits)
 --(student, course, status)
-CREATE VIEW Registrations AS 
+CREATE OR REPLACE VIEW Registrations AS 
 SELECT student AS idnr,course,'registered' AS status
 FROM Registered
 UNION
 SELECT student AS idnr,course,'waiting' AS status
 FROM WaitingList;
 
-CREATE VIEW UnreadMandatory AS
+CREATE OR REPLACE VIEW UnreadMandatory AS
 WITH MandatoryCourses AS (
     SELECT idnr,course FROM BasicInformation I
     JOIN MandatoryProgram M ON M.program=I.program
@@ -93,14 +93,8 @@ LEFT JOIN MathCredits Ma ON Ma.idnr = S.idnr
 LEFT JOIN ResearchCredits Re ON Re.idnr = S.idnr
 LEFT JOIN SeminarCourses Se ON Se.idnr = S.idnr;
 
-/*
-CREATE VIEW CourseQueuePositions AS
-SELECT course,student,ROW_NUMBER () OVER (ORDER BY position) AS place
-FROM WaitingList
-ORDER BY (course,position);
-*/
-CREATE VIEW CourseQueuePositions AS
+--CourseQueuePositions(course,student,place)
+CREATE OR REPLACE VIEW CourseQueuePositions AS
 SELECT course, student, row_number() OVER
         (PARTITION BY course ORDER BY position) AS place
 FROM WaitingList ORDER BY (course,position);
---CourseQueuePositions(course,student,place)

@@ -3,3 +3,4 @@ INSERT INTO Registrations VALUES (4444444444,'CCC333'); -- has already passed th
 INSERT INTO Registrations VALUES (1111111111,'CCC555'); -- should insert into course
 INSERT INTO Registrations VALUES (6666666666,'CCC222'); -- should insert into waitinglist
 DELETE FROM Registrations WHERE idnr='1111111111' AND course='CCC111';
+DELETE FROM Registrations WHERE idnr='1111111111' AND course='CCC222';
