@@ -50,7 +50,7 @@ CREATE TABLE Prerequisites (
 
 CREATE TABLE LimitedCourses(
     code CHAR(6) PRIMARY KEY REFERENCES Courses(code),
-    capacity INT NOT NULL CHECK (capacity>=0)
+    capacity INT NOT NULL CHECK (capacity > 0)
 );
 
 CREATE TABLE Classified(

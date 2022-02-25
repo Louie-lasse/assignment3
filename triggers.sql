@@ -49,7 +49,26 @@ $registration_insertion$ LANGUAGE plpgsql;
 CREATE TRIGGER insertInRegistrations INSTEAD OF INSERT ON Registrations
     FOR EACH ROW EXECUTE FUNCTION registration_insertion();
 
+CREATE OR REPLACE FUNCTION registered_deletion(TEXT) RETURNS VOID AS $$
+    DECLARE
+        firstInLine WaitingList%rowtype;
+    BEGIN
+        IF NOT (courseOverbooked($1)) THEN
+            RAISE NOTICE 'Did a thing';
+            SELECT student,course FROM WaitingList W INTO firstInLine
+                WHERE W.course = $1
+                ORDER BY position
+                LIMIT 1;
+            DELETE FROM WaitingList W WHERE W.student = firstInLine.student
+                                            AND W.course = firstInLine.course;
+        END IF;
+    END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION registrations_deletion() RETURNS trigger AS $registrations_deletion$
+    DECLARE
+        firstInLine WaitingList%rowtype;
     BEGIN
         IF (NEW.status = 'waiting') THEN
             DELETE FROM WaitingList W WHERE W.student = OLD.idnr
@@ -58,7 +77,13 @@ CREATE OR REPLACE FUNCTION registrations_deletion() RETURNS trigger AS $registra
         ELSE
             DELETE FROM Registered r WHERE R.student = OLD.idnr
                                         AND R.course = OLD.course;
-            RAISE NOTICE 'Deleted registered student';
+            SELECT student,course FROM WaitingList W INTO firstInLine
+                WHERE W.course = OLD.COURSE
+                ORDER BY position
+                LIMIT 1;
+            RAISE NOTICE 'Need to delete % from waitinglist', firstInLine.student;
+            EXECUTE 'DELETE FROM WaitingList WHERE student = $1 AND
+                                            course = $2' USING firstInLine.student,firstInLine.course;
         END IF;
         RETURN OLD;
     END;
@@ -66,24 +91,3 @@ $registrations_deletion$ LANGUAGE plpgsql;
 
 CREATE TRIGGER deleteFromRegistrations INSTEAD OF DELETE ON Registrations
     FOR EACH ROW EXECUTE FUNCTION registrations_deletion();
-
-CREATE OR REPLACE FUNCTION registered_deletion() RETURNS trigger AS $registered_deletion$
-    DECLARE
-        firstInLine WaitingList%rowtype;
-    BEGIN
-        RAISE EXCEPTION 'Overbooked: %', (courseOverbooked(OLD.course));
-        IF NOT (courseOverbooked(OLD.course)) THEN
-            RAISE NOTICE 'Did a thing';
-            SELECT * FROM WaitingList W INTO firstInLine
-                WHERE W.course = OLD.course
-                ORDER BY position
-                LIMIT 1;
-            DELETE FROM WaitingList W WHERE W.student = firstInLine.student
-                                            AND W.course = firstInLine.course;
-        END IF;
-        RETURN firstInLine;
-    END;
-$registered_deletion$ LANGUAGE plpgsql;
-
-CREATE TRIGGER deleteFromRegistered AFTER DELETE ON Registered
-    FOR EACH ROW EXECUTE FUNCTION registered_deletion();
