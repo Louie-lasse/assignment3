@@ -71,7 +71,7 @@ CREATE OR REPLACE FUNCTION registered_deletion() RETURNS trigger AS $registered_
     DECLARE
         firstInLine WaitingList%rowtype;
     BEGIN
-        RAISE EXCEPTION 'Overbooked: %', (courseOverbooked(OLD.course))
+        RAISE EXCEPTION 'Overbooked: %', (courseOverbooked(OLD.course));
         IF NOT (courseOverbooked(OLD.course)) THEN
             RAISE NOTICE 'Did a thing';
             SELECT * FROM WaitingList W INTO firstInLine
