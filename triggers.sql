@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION prerequisitesMet(TEXT,TEXT) RETURNS BOOLEAN AS $$
         WHERE Pre.course = $2
         EXCEPT
         SELECT Pas.course FROM PassedCourses Pas
-        WHERE Pas.idnr = $1
+        WHERE Pas.student = $1
     ) THEN False
     ELSE True
     END;
