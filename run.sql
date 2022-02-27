@@ -1,8 +1,7 @@
 \i yeet.sql;
-\i tables.sql;
-\i inserts.sql;
-\i views.sql;
+\i setup.sql;
 \i triggers.sql;
 
-
-SELECT * FROM PathToGraduation;
+SELECT * FROM Registrations;
+SELECT * FROM PassedCourses;
+SELECT student,course FROM Taken EXCEPT (SELECT idnr,course FROM PassedCourses);
