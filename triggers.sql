@@ -33,21 +33,21 @@ $$;
 
 CREATE OR REPLACE FUNCTION registration_insertion() RETURNS trigger AS $registration_insertion$
     BEGIN
-        IF NOT prerequisitesMet(NEW.idnr,NEW.course) THEN
+        IF NOT prerequisitesMet(NEW.student,NEW.course) THEN
             RAISE EXCEPTION 'Not all prerequisites met for %',NEW.course;
         END IF;
         IF EXISTS (SELECT * FROM PassedCourses P
-                   WHERE P.idnr = NEW.idnr AND P.course = NEW.course) THEN
-            RAISE EXCEPTION 'Student % has already passed the course',NEW.idnr;
+                   WHERE P.student = NEW.student AND P.course = NEW.course) THEN
+            RAISE EXCEPTION 'Student % has already passed the course',NEW.student;
         END IF;
-        IF ((NEW.idnr,NEW.course) IN (SELECT idnr,course FROM Registrations)) THEN
+        IF ((NEW.student,NEW.course) IN (SELECT student,course FROM Registrations)) THEN
             RAISE EXCEPTION 'Student is already registered or in the waitinglist for course %',NEW.course;
         END IF;
         IF courseOverbooked(NEW.course) THEN
             RAISE NOTICE 'Course % is fully booked, putting student into waitinglist',NEW.course;
-            INSERT INTO WaitingList VALUES (NEW.idnr,NEW.course);
+            INSERT INTO WaitingList VALUES (NEW.student,NEW.course);
         ELSE
-            INSERT INTO Registered VALUES (NEW.idnr,NEW.course);
+            INSERT INTO Registered VALUES (NEW.student,NEW.course);
         END IF;
         RETURN NEW;
     END;
@@ -78,11 +78,11 @@ CREATE OR REPLACE FUNCTION registrations_deletion() RETURNS trigger AS $registra
         firstInLine WaitingList%rowtype;
     BEGIN
         IF (NEW.status = 'waiting') THEN
-            DELETE FROM WaitingList W WHERE W.student = OLD.idnr
+            DELETE FROM WaitingList W WHERE W.student = OLD.student
                                         AND W.course = OLD.course;
             RAISE NOTICE 'Deleted waiting student';
         ELSE
-            DELETE FROM Registered r WHERE R.student = OLD.idnr
+            DELETE FROM Registered r WHERE R.student = OLD.student
                                         AND R.course = OLD.course;
             SELECT student,course FROM WaitingList W INTO firstInLine
                 WHERE W.course = OLD.COURSE
