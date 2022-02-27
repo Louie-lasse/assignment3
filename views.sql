@@ -93,8 +93,3 @@ LEFT JOIN MathCredits Ma ON Ma.idnr = S.idnr
 LEFT JOIN ResearchCredits Re ON Re.idnr = S.idnr
 LEFT JOIN SeminarCourses Se ON Se.idnr = S.idnr;
 
---CourseQueuePositions(course,student,place)
-CREATE OR REPLACE VIEW CourseQueuePositions AS
-SELECT course, student, row_number() OVER
-        (PARTITION BY course ORDER BY position) AS place
-FROM WaitingList ORDER BY (course,position);

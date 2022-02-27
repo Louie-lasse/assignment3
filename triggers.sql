@@ -1,3 +1,10 @@
+--CourseQueuePositions(course,student,place)
+CREATE OR REPLACE VIEW CourseQueuePositions AS
+SELECT course, student, row_number() OVER
+        (PARTITION BY course ORDER BY position) AS place
+FROM WaitingList ORDER BY (course,position);
+
+
 CREATE OR REPLACE FUNCTION prerequisitesMet(TEXT,TEXT) RETURNS BOOLEAN AS $$
     SELECT CASE WHEN EXISTS (
         SELECT Pre.course FROM Prerequisites Pre
