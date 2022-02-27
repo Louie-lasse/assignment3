@@ -18,7 +18,7 @@ DECLARE
                     FROM Registered R
                     GROUP BY R.course
                     ) P ON P.course = $1
-                    WHERE code = $1);
+                    WHERE code = $1); -- rewrite using exists and 'WHERE amount >= capacity
 BEGIN
     RETURN full;
 END;
@@ -84,6 +84,7 @@ CREATE OR REPLACE FUNCTION registrations_deletion() RETURNS trigger AS $registra
             RAISE NOTICE 'Need to delete % from waitinglist', firstInLine.student;
             EXECUTE 'DELETE FROM WaitingList WHERE student = $1 AND
                                             course = $2' USING firstInLine.student,firstInLine.course;
+            INSERT INTO Registered VALUES (firstInLine.student,firstInLine.course);
         END IF;
         RETURN OLD;
     END;
