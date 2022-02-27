@@ -59,4 +59,4 @@ INSERT INTO Registrations VALUES ('3333333333', 'CCC111');
 
 -- TEST #15: Register student which has read but not passed the course.
 -- EXPECTED OUTCOME: Pass
-INSERT INTO Registrations VALUES ('4444444444', 'CCC888');
+INSERT INTO Registrations VALUES ('4444444444', 'CCC111');

@@ -7,7 +7,7 @@ FROM WaitingList ORDER BY (course,position);
 
 CREATE OR REPLACE FUNCTION prerequisitesMet(TEXT,TEXT) RETURNS BOOLEAN AS $$
     SELECT CASE WHEN EXISTS (
-        SELECT Pre.course FROM Prerequisites Pre
+        SELECT Pre.requires FROM Prerequisites Pre
         WHERE Pre.course = $2
         EXCEPT
         SELECT Pas.course FROM PassedCourses Pas
@@ -72,26 +72,33 @@ CREATE OR REPLACE FUNCTION registered_deletion(TEXT) RETURNS VOID AS $$
     END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION hasWaitingList(TEXT)
+RETURNS BOOLEAN LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN EXISTS (SELECT * FROM WaitingList WHERE course = $1);
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION registrations_deletion() RETURNS trigger AS $registrations_deletion$
     DECLARE
         firstInLine WaitingList%rowtype;
     BEGIN
-        IF (NEW.status = 'waiting') THEN
+        IF (OLD.status = 'waiting') THEN
             DELETE FROM WaitingList W WHERE W.student = OLD.student
                                         AND W.course = OLD.course;
-            RAISE NOTICE 'Deleted waiting student';
         ELSE
             DELETE FROM Registered r WHERE R.student = OLD.student
                                         AND R.course = OLD.course;
-            SELECT student,course FROM WaitingList W INTO firstInLine
-                WHERE W.course = OLD.COURSE
-                ORDER BY position
-                LIMIT 1;
-            RAISE NOTICE 'Need to delete % from waitinglist', firstInLine.student;
-            EXECUTE 'DELETE FROM WaitingList WHERE student = $1 AND
-                                            course = $2' USING firstInLine.student,firstInLine.course;
-            INSERT INTO Registered VALUES (firstInLine.student,firstInLine.course);
+            IF (hasWaitingList(OLD.course) AND
+                NOT courseOverbooked(OLD.course)) THEN
+                SELECT student,course FROM WaitingList W INTO firstInLine
+                    WHERE W.course = OLD.COURSE
+                    ORDER BY position
+                    LIMIT 1;
+                EXECUTE 'DELETE FROM WaitingList WHERE student = $1 AND
+                                                course = $2' USING firstInLine.student,firstInLine.course;
+                INSERT INTO Registered VALUES (firstInLine.student,firstInLine.course);
+            END IF;
         END IF;
         RETURN OLD;
     END;

@@ -61,7 +61,7 @@ INSERT INTO Taken VALUES('4444444444','CCC111','5'),
                         ('2222222222','CCC111','U'),
                         ('2222222222','CCC222','U'),
                         ('2222222222','CCC444','U');
-
+                
 
 INSERT INTO WaitingList VALUES('3333333333','CCC222'),
                               ('3333333333','CCC333'), 

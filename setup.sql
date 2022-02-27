@@ -158,8 +158,8 @@ INSERT INTO Courses VALUES ('CCC111','C1',22.5,'Dep1'),
                            ('CCC444','C4',60,'Dep1'),
                            ('CCC555','C5',50,'Dep1'),
                            ('CCC666','C6',40,'Dep1'),
-                           ('CCC777','C6',15,'Dep1'),
-                           ('CCC888','C6',03,'Dep1');
+                           ('CCC777','C7',15,'Dep1'),
+                           ('CCC888','C8',03,'Dep1');
 
 INSERT INTO LimitedCourses VALUES ('CCC222',1),
                                   ('CCC333',2),
@@ -195,7 +195,8 @@ INSERT INTO Registered VALUES ('2222222222','CCC111'),
                               ('1111111111','CCC777'),
                               ('2222222222','CCC777');
 
-INSERT INTO Taken VALUES ('4444444444', 'CCC888', 'U'),
+INSERT INTO Taken VALUES ('4444444444', 'CCC888', '3'),
+                         ('4444444444', 'CCC111', 'U'),                            
                          ('1111111111', 'CCC888', '3'),
                          ('2222222222', 'CCC888', '5'),
                          ('5555555555', 'CCC111', '4'),
@@ -206,9 +207,11 @@ INSERT INTO Taken VALUES ('4444444444', 'CCC888', 'U'),
 INSERT INTO WaitingList VALUES('3333333333','CCC777'),
                               ('5555555555','CCC333'), 
                               ('6666666666','CCC333'),
-                              ('3333333333', 'CCC666'),
+                              ('3333333333','CCC666'),
                               ('4444444444','CCC666'),
                               ('5555555555','CCC666');
+
+INSERT INTO Prerequisites VALUES('CCC111','CCC888');
 
 
 
