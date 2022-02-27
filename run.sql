@@ -4,4 +4,4 @@
 
 SELECT * FROM Registrations;
 SELECT * FROM PassedCourses;
-SELECT student,course FROM Taken EXCEPT (SELECT idnr,course FROM PassedCourses);
+SELECT student,course FROM Taken EXCEPT (SELECT student,course FROM PassedCourses);
