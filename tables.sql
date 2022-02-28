@@ -23,8 +23,8 @@ CREATE TABLE Branches(
 
 CREATE TABLE Students (
     idnr TEXT PRIMARY KEY CHECK (idnr SIMILAR TO '[0-9]{10}'),
-    name TEXT NOT NULL CHECK (login LIKE '_%'),
-    login TEXT UNIQUE NOT NULL CHECK (login LIKE '_%'),
+    name TEXT NOT NULL,
+    login TEXT UNIQUE NOT NULL,
     program TEXT NOT NULL REFERENCES Programs(name),
     UNIQUE(idnr,program)
 );
