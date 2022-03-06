@@ -10,7 +10,7 @@ public class PortalConnection {
     // For connecting to the portal database on your local machine
     static final String DATABASE = "jdbc:postgresql://localhost/"+DBNAME;
     static final String USERNAME = "postgres";
-    static final String PASSWORD = "pstgrs";
+    static final String PASSWORD = "postgres";
 
     // For connecting to the chalmers database server (from inside chalmers)
     // static final String DATABASE = "jdbc:postgresql://brage.ita.chalmers.se/";
@@ -36,11 +36,24 @@ public class PortalConnection {
 
 
     // Register a student on a course, returns a tiny JSON document (as a String)
-    public String register(String student, String courseCode){
+    public String register(String student, String courseCode) {
+        try(PreparedStatement st =conn.prepareStatement(
+                "INSERT INTO Registrations VALUES (?,?);"
+        )){
+           st.setString(1, student);
+            st.setString(2,courseCode);
+            int res = st.executeUpdate();
+            if (res >=1){
+                return "INSERT "+res;
+            } else {
+                return "{\"student\":\"does not exist :(\"}";
+            }
+        } catch (SQLException sqlException){
+            return getError(sqlException);
+        }
       
       // placeholder, remove along with this comment. 
-      return "{\"success\":false, \"error\":\"Registration is not implemented yet :(\"}";
-      
+
       // Here's a bit of useful code, use it or delete it 
       // } catch (SQLException e) {
       //    return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
@@ -49,7 +62,21 @@ public class PortalConnection {
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
     public String unregister(String student, String courseCode){
-      return "{\"success\":false, \"error\":\"Unregistration is not implemented yet :(\"}";
+        try(PreparedStatement st = conn.prepareStatement(
+                "DELETE FROM Registrations WHERE student=? AND course=?;"
+        )){
+            st.setString(1,student);
+            st.setString(2,courseCode);
+            int res = st.executeUpdate();
+
+            if (res >=1){
+                return "DELETE "+res;
+            } else {
+                return "{\"student\":\"does not exist :(\"}";
+            }
+        } catch (SQLException sqlException){
+            return getError(sqlException);
+        }
     }
 
     // Return a JSON document containing lots of information about a student, it should validate against the schema found in information_schema.json
@@ -57,18 +84,18 @@ public class PortalConnection {
         
         try(PreparedStatement st = conn.prepareStatement(
             // replace this with something more useful
-            "SELECT jsonb_build_object('student',idnr,'name',name) AS jsondata FROM BasicInformation WHERE idnr=?"
+            "SELECT jsonb_build_object('student',idnr,'name',name,'courses') AS jsondata FROM BasicInformation WHERE idnr=?"
             );){
             
             st.setString(1, student);
-            
+
             ResultSet rs = st.executeQuery();
-            
+
             if(rs.next())
               return rs.getString("jsondata");
             else
-              return "{\"student\":\"does not exist :(\"}"; 
-            
+              return "{\"student\":\"does not exist :(\"}";
+
         } 
     }
 
