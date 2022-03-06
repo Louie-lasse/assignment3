@@ -5,3 +5,8 @@ INSERT INTO Registrations VALUES (6666666666,'CCC222'); -- should insert into wa
 DELETE FROM Registrations WHERE idnr='1111111111' AND course='CCC111';
 DELETE FROM Registrations WHERE idnr='1111111111' AND course='CCC222';
 DELETE FROM Registrations WHERE idnr='1111111111' AND course='CCC333';
+
+SELECT idnr,name,login,program,branch,json_build_array(json_build_object('course',T.course,'grade',grade)) finnished FROM BasicInformation B
+JOIN PathToGraduation P ON B.idnr=P.student
+FULL OUTER JOIN Taken T ON P.student=T.student
+GROUP BY (idnr,name,login,program,branch);

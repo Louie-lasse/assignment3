@@ -69,10 +69,11 @@ public class PortalConnection {
         
         try(PreparedStatement st = conn.prepareStatement(
             // replace this with something more useful
-            "SELECT jsonb_build_object('student',idnr,'name',name,'course',array_agg(course)) AS jsondata " +
+            "SELECT jsonb_build_object('student',idnr,'name',name,'login',login,'program',program" +
+                    ",'course',array_agg(course)) AS jsondata " +
                     "FROM BasicInformation JOIN Registrations ON student=idnr " +
                     "WHERE idnr=? " +
-                    "GROUP BY (idnr,name)"
+                    "GROUP BY (idnr,name,login,program)"
             )){
             
             st.setString(1, student);
