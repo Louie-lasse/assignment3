@@ -40,24 +40,14 @@ public class PortalConnection {
         try(PreparedStatement st =conn.prepareStatement(
                 "INSERT INTO Registrations VALUES (?,?);"
         )){
-           st.setString(1, student);
+            st.setString(1, student);
             st.setString(2,courseCode);
-            int res = st.executeUpdate();
-            if (res >=1){
-                return "INSERT "+res;
-            } else {
-                return "{\"student\":\"does not exist :(\"}";
-            }
-        } catch (SQLException sqlException){
-            return getError(sqlException);
-        }
-      
-      // placeholder, remove along with this comment. 
+            st.executeUpdate();
+            return "{\"success\":true\"}";
 
-      // Here's a bit of useful code, use it or delete it 
-      // } catch (SQLException e) {
-      //    return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
-      // }     
+        } catch (SQLException e){
+            return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
+        }
     }
 
     // Unregister a student from a course, returns a tiny JSON document (as a String)
@@ -67,15 +57,10 @@ public class PortalConnection {
         )){
             st.setString(1,student);
             st.setString(2,courseCode);
-            int res = st.executeUpdate();
-
-            if (res >=1){
-                return "DELETE "+res;
-            } else {
-                return "{\"student\":\"does not exist :(\"}";
-            }
-        } catch (SQLException sqlException){
-            return getError(sqlException);
+            st.executeUpdate();
+            return "{\"success\":true\"}";
+        } catch (SQLException e){
+            return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
         }
     }
 
@@ -84,15 +69,19 @@ public class PortalConnection {
         
         try(PreparedStatement st = conn.prepareStatement(
             // replace this with something more useful
-            "SELECT jsonb_build_object('student',idnr,'name',name,'courses') AS jsondata FROM BasicInformation WHERE idnr=?"
-            );){
+            "SELECT jsonb_build_object('student',idnr,'name',name,'course',array_agg(course)) AS jsondata " +
+                    "FROM BasicInformation JOIN Registrations ON student=idnr " +
+                    "WHERE idnr=? " +
+                    "GROUP BY (idnr,name)"
+            )){
             
             st.setString(1, student);
 
             ResultSet rs = st.executeQuery();
 
-            if(rs.next())
-              return rs.getString("jsondata");
+            if(rs.next()) {
+                return rs.getString("jsondata");
+            }
             else
               return "{\"student\":\"does not exist :(\"}";
 
