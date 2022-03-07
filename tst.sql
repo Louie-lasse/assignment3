@@ -15,3 +15,16 @@ JOIN PathToGraduation P ON B.idnr=P.student
 FULL OUTER JOIN Taken T ON P.student=T.student
 FULL OUTER JOIN Registrations R ON R.student = B.idnr
 GROUP BY (idnr,name,login,program,branch,seminarcourses,mathcredits,researchcredits,totalCredits,qualified);
+
+
+/*
+ String sb = "SELECT json_build_object('idnr',idnr,'name',name,'login',login,'program',program,'branch',branch," +
+"    'finished',array_agg(json_build_object('course',T.course,'grade',grade))," +
+"    'registered',array_agg(R.course), 'seminarcourses',seminarcourses,'mathcredits',mathcredits," +
+"    'researchcredits',researchcredits,'totalCredits',totalCredits,'canGraguate',qualified)" +
+"FROM BasicInformation B" +
+"JOIN PathToGraduation P ON B.idnr=P.student" +
+"FULL OUTER JOIN Taken T ON P.student=T.student" +
+"FULL OUTER JOIN Registrations R ON R.student = B.idnr" +
+"GROUP BY (idnr,name,login,program,branch,seminarcourses,mathcredits,researchcredits,totalCredits,qualified);";
+ */
