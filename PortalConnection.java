@@ -69,11 +69,14 @@ public class PortalConnection {
         
         try(PreparedStatement st = conn.prepareStatement(
             // replace this with something more useful
-            "SELECT jsonb_build_object('student',idnr,'name',name,'login',login,'program',program" +
-                    ",'course',array_agg(course)) AS jsondata " +
-                    "FROM BasicInformation JOIN Registrations ON student=idnr " +
-                    "WHERE idnr=? " +
-                    "GROUP BY (idnr,name,login,program)"
+            "SELECT idnr,name,login,program,branch,array_agg(json_build_object('course',T.course,'grade',grade)) finnished, " +
+                    "array_agg(R.course) registered, " +
+                    "seminarcourses,mathcredits,researchcredits,totalCredits,qualified AS canGraguate " +
+                "FROM BasicInformation B" +
+                "JOIN PathToGraduation P ON B.idnr=P.student" +
+                "FULL OUTER JOIN Taken T ON P.student=T.student" +
+                "FULL OUTER JOIN Registrations R ON R.student = B.idnr " +
+                "GROUP BY (idnr,name,login,program,branch,seminarcourses,mathcredits,researchcredits,totalCredits,canGraguate) "
             )){
             
             st.setString(1, student);
