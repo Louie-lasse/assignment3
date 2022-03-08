@@ -69,14 +69,17 @@ public class PortalConnection {
         
         try(PreparedStatement st = conn.prepareStatement(
             // replace this with something more useful
-            "SELECT idnr,name,login,program,branch,array_agg(json_build_object('course',T.course,'grade',grade)) finnished, " +
-                    "array_agg(R.course) registered, " +
-                    "seminarcourses,mathcredits,researchcredits,totalCredits,qualified AS canGraguate " +
-                "FROM BasicInformation B" +
-                "JOIN PathToGraduation P ON B.idnr=P.student" +
-                "FULL OUTER JOIN Taken T ON P.student=T.student" +
+            "SELECT json_build_object('idnr',idnr,'name',name,'login',login,'program',program,'branch',branch, "+
+                    "'finished',array_agg(json_build_object('course',T.course,'grade',grade)), "+
+                    "'registered',array_agg(R.course), 'seminarcourses',seminarcourses,'mathcredits',mathcredits, "+
+                    "'researchcredits',researchcredits,'totalCredits',totalCredits,'canGraguate',qualified) jsondata " +
+                "FROM BasicInformation B " +
+                "FULL OUTER JOIN PathToGraduation P ON B.idnr=P.student " +
+                "FULL OUTER JOIN Taken T ON P.student=T.student " +
                 "FULL OUTER JOIN Registrations R ON R.student = B.idnr " +
-                "GROUP BY (idnr,name,login,program,branch,seminarcourses,mathcredits,researchcredits,totalCredits,canGraguate) "
+                "WHERE B.idnr=? " +
+                "GROUP BY (idnr,name,login,program,branch,seminarcourses,mathcredits,researchcredits,totalCredits,qualified) "
+
             )){
             
             st.setString(1, student);
