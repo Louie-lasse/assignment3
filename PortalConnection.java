@@ -57,8 +57,12 @@ public class PortalConnection {
         )){
             st.setString(1,student);
             st.setString(2,courseCode);
-            st.executeUpdate();
-            return "{\"success\":true\"}";
+            int res = st.executeUpdate();
+            if (res >= 1) {
+                return "{\"success\":true\"}";
+            } else {
+                throw new SQLException("Student "+student+" not registered or in waitinglist for "+courseCode);
+            }
         } catch (SQLException e){
             return "{\"success\":false, \"error\":\""+getError(e)+"\"}";
         }
@@ -77,11 +81,11 @@ public class PortalConnection {
                         "JOIN Courses ON R.course = code " +
                         "FULL OUTER JOIN CourseQueuePositions Q ON code = Q.course AND R.student = Q.student " +
                 ") " +
-                "SELECT json_build_object('idnr',idnr,'name',B.name,'login',login,'program',program,'branch',branch, " +
+                "SELECT json_build_object('student',idnr,'name',B.name,'login',login,'program',program,'branch',branch, " +
                         "'finished',array_agg(json_build_object('course',T.name,'code',T.code,'credits',T.credits,'grade',grade)), " +
                         "'registered',array_agg(json_build_object('course',R.name,'code',R.code,'status',R.status,'position',R.position)), " +
-                        "'seminarcourses',seminarcourses,'mathcredits',mathcredits, " +
-                        "'researchcredits',researchcredits,'totalCredits',totalCredits,'canGraduate',qualified) jsondata " +
+                        "'seminarCourses',seminarcourses,'mathCredits',mathcredits, " +
+                        "'researchCredits',researchcredits,'totalCredits',totalCredits,'canGraduate',qualified) jsondata " +
                 "FROM T " +
                 "FULL OUTER JOIN BasicInformation B ON B.idnr=T.student " +
                 "JOIN PathToGraduation P ON B.idnr=P.student " +
