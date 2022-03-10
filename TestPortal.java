@@ -7,21 +7,57 @@ public class TestPortal {
 
    public static void main(String[] args) {
       try{
+
          PortalConnection c = new PortalConnection();
-   
-         // Write your tests here. Add/remove calls to pause() as desired. 
-         // Use println instead of prettyPrint to get more compact output (if your raw JSON is already readable)
-   
-         System.out.println(c.unregister("2222222222", "CCC333"));
+
+         String s1 = "1111111111";
+         String s2 = "2222222222";
+         String s4 = "4444444444";
+         String s6 = "6666666666";
+
+         //1
+         System.out.println(c.getInfo(s2));
+
          pause();
 
-         prettyPrint(c.getInfo("2222222222")); 
-         pause();
+         //2
+         System.out.println(c.register(s2, "CCC444"));
+         System.out.println(c.getInfo(s2));
 
-         System.out.println(c.register("2222222222", "CCC333")); 
          pause();
+         //3
+         System.out.println(c.register(s2, "CCC444")); //error
 
-         prettyPrint(c.getInfo("2222222222"));
+         pause();
+         //4
+         System.out.println(c.unregister(s2, "CCC444")); //SELECT * FROM Registrations WHERE student = '2222222222'
+         pause();
+         System.out.println(c.unregister(s2, "CCC444")); //error
+
+         pause();
+         //5
+         System.out.println(c.register(s6, "CCC111")); //error
+
+         pause();
+         //6
+         System.out.println(c.unregister(s4, "CCC333"));
+         System.out.println(c.register(s4, "CCC333")); //SELECT * FROM CourseQueuePositions WHERE course = 'CCC333'
+        
+         pause();
+         //7
+         //SELECT * FROM CourseQueuePositions WHERE course = 'CCC333'
+         System.out.println(c.unregister(s4, "CCC333")); //SELECT * FROM CourseQueuePositions WHERE course = 'CCC333'
+         pause();
+         System.out.println(c.register(s4, "CCC333")); //SELECT * FROM CourseQueuePositions WHERE course = 'CCC333'
+
+         pause();
+         //8
+         System.out.println(c.unregister(s1, "CCC777")); //SELECT * FROM Registrations WHERE course = 'CCC777'
+
+         pause();
+         //9
+         System.out.println(c.unregister(s1, "CCC333'; DELETE FROM Registrations WHERE student=student;--")); //SELECT * FROM Registrations
+         pause();
 
 
 
@@ -42,7 +78,7 @@ public class TestPortal {
    
    // This is a truly horrible and bug-riddled hack for printing JSON. 
    // It is used only to avoid relying on additional libraries.
-   // If you are a student, please avert your eyes.
+   // If you are a s2ent, please avert your eyes.
    public static void prettyPrint(String json){
       System.out.print("Raw JSON:");
       System.out.println(json);
